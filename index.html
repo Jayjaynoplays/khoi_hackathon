@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ĐBRR</title>
+    <script class="jsbin" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6" crossorigin="anonymous">
+    <link rel="stylesheet" href="./styles.css">
+
+    <style>
+
+    </style>
+</head>
+
+<body>
+    <div class="file-upload">
+        <button class="file-upload-btn" type="button" onclick="$('.file-upload-input').trigger( 'click' )">Add
+            Image</button>
+        <div class="image-upload-wrap">
+            <input class="file-upload-input" type='file' onchange="readURL(this);" accept="image/*" />
+            <div class="drag-text">
+                <h3>Drag and drop a file or select add Image</h3>
+            </div>
+        </div>
+        <div class="file-upload-content">
+            <img class="file-upload-image" src="#" alt="your image" />
+            <div class="image-title-wrap">
+                <button type="button" onclick="removeUpload()" class="remove-image">Remove Image</button>
+                <button type="button" onclick="postUpload()" class="post-image">Post Image</button>
+            </div>
+            <div>
+                <label for="output-url">Magic happens here: </label>
+                <input style="margin-top:25px;" class="input-link" id="output-url" name="output-url">
+                <button onclick="copy()" class="copy-btn">Copy All</button>
+            </div>
+        </div>
+        <div class="image__sample-list">
+            <!-- <img src="./img/1.jpg" alt="">
+            <img src="./img/2.jpg" alt="">
+            <img src="./img/3.jpg" alt="">
+            <img src="./img/4.jpg" alt="">
+            <img src="./img/5.jpg" alt=""> -->
+        </div>
+        <div class="row" style="margin-top: 20px;--bs-gutter-x: 0.5rem;">
+            <div class="col">
+                <button style="border: none;" onclick="imgClick(1)">
+                    <img src="./img/1.jpg" style="width: 100px;" class="rounded" alt="">
+                </button>
+            </div>
+            <div class="col">
+                <button style="border: none;" onclick="imgClick(2)">
+                    <img src="./img/2.jpg" style="width: 100px;" class="rounded" alt="">
+                </button>
+            </div>
+            <div class=" col">
+                <button style="border: none;" onclick="imgClick(3)">
+                    <img src="./img/3.jpg" style="width: 100px;" class="rounded" alt="">
+                </button>
+            </div>
+            <div class="col">
+                <button style="border: none;" onclick="imgClick(4)">
+                    <img src="./img/4.jpg" style="width: 100px;" class="rounded" alt="">
+                </button>
+            </div>
+            <div class=" col">
+                <button style="border: none;" onclick="imgClick(5)">
+                    <img src="./img/5.jpg" style="width: 90px;" class="rounded" alt="">
+                </button>
+            </div>
+        </div>
+    </div>
+</body>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+    crossorigin="anonymous"></script>
+<script>
+    var imgData;
+    function imgClick(imgNumber) {
+        console.log("click at" + imgNumber);
+        document.getElementsByClassName('image-upload-wrap')[0].style.display = "none";
+        document.getElementsByClassName('file-upload-image')[0].src = "./img/" + imgNumber + '.jpg';
+        document.getElementsByClassName('file-upload-content')[0].style.display = "block";
+        document.getElementsByClassName('row')[0].style.display = "none"
+
+    }
+    function readURL(input) {
+        if (input.files && input.files[0]) {
+            console.log(input.files[0]);
+            var reader = new FileReader();
+            reader.onload = function (e) {
+                $('.image-upload-wrap').hide();
+                $('.file-upload-image').attr('src', e.target.result);
+                $('.file-upload-content').show();
+                $('.image-title').html(input.files[0].name);
+                imgData = e.target.result;
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function removeUpload() {
+        $('.file-upload-input').replaceWith($('.file-upload-input').clone());
+        $('.file-upload-content').hide();
+        $('.image-upload-wrap').show();
+        if (document.getElementsByClassName('row')[0].style.display == "none") {
+            document.getElementsByClassName('row')[0].style.display = "flex";
+        }
+    }
+    $('.image-upload-wrap').bind('dragover', function () {
+        $('.image-upload-wrap').addClass('image-dropping');
+    });
+    $('.image-upload-wrap').bind('dragleave', function () {
+        $('.image-upload-wrap').removeClass('image-dropping');
+    });
+    function postUpload() {
+        window.fetch('https://60389e934e3a9b0017e938ae.mockapi.io/articles', {
+            method: 'POST',
+            body: imgData
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data.path)
+            })
+            .then(response => document.getElementById('output-url').value = response)
+            .catch(error => {
+                console.error(error)
+            })
+    }
+    function copy() {
+        var copyText = document.getElementById("output-url");
+        copyText.select();
+        copyText.setSelectionRange(0, 99999);
+        document.execCommand("copy");
+    }
+</script>
+
+</html>
